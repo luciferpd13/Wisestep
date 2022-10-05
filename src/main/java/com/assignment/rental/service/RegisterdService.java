@@ -2,6 +2,8 @@ package com.assignment.rental.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +25,15 @@ public class RegisterdService {
     public boolean save(Registered registered) {
         RegisterQueue queue = registerQueueRepository.findByUseridAndOutletidAndVehicleid(registered.getUserid(), registered.getOutletid(), registered.getVehicleid());
         if(queue != null){
+            registered.setPickuptime(new Date());
+            long duration  = registered.getPickuptime().getTime() - queue.getRegisteredtime().getTime();
+            long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(duration);
             registerQueueRepository.deleteById(queue.getId());
-            registerdRepository.save(registered);
-            return true;
+            if(diffInMinutes <= 10){
+                registerdRepository.save(registered);
+                return true;
+            }
+            return false;
         }
         return false;
     }

@@ -41,6 +41,7 @@ public class RegisterQueueService {
         }
         Registered isRiding = registerdRepository.findByUseridAndOutletidAndVehicleid(registerQueue.getUserid(), registerQueue.getOutletid(), registerQueue.getVehicleid());
         if(isRiding == null){
+            registerQueue.setRegisteredtime(new Date());
             registerQueueRepository.save(registerQueue);
             return true;
         }
